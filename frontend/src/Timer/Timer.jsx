@@ -4,6 +4,12 @@ import './Timer.css'
 const Timer = () => {
     const [time, setTime] = useState(0) //time in seconds
     const [isRunning, setIsRunning] = useState(false)
+    const [lockInTime, setLockInTime] = useState(0); //time for lockin timer
+    const [clockOutTime, setClockOutTime] = useState(0) //time for clock out timer
+    const [isLockInRunning, setIsLockInRunning] = useState (false) // is lock in running?
+    const [isClockOutRunning, setIsClockOutRunning] = useState(false) // is clock out running?
+    const [showClockOut, setShowClockOut] = useState(false) //toggle between lock and clock display
+
 
     //start+stop
     const toggleTimer = () => {
@@ -13,15 +19,19 @@ const Timer = () => {
     //timer logic
     useEffect(() =>{
         let interval
-        if (isRunning) {
+        if (isLockInRunning) {
             interval = setInterval(()=> {
-                setTime((prevTime) => prevTime+1)
+                setLockInTime((prevTime) => prevTime+1)
+            }, 10)
+        } else if (isClockOutRunning) {
+            interval = setInterval(()=> {
+                setClockOutTime((prevTime) => prevTime+1)
             }, 10)
         } else {
             clearInterval(interval)
-        } 
+        }
         return () => clearInterval(interval)
-    }, [isRunning])
+    }, [isLockInRunning, isClockOutRunning])
 
     //timer formating
     const formatTime = (hundredths) =>{
@@ -32,10 +42,55 @@ const Timer = () => {
         return `${hours}:${minutes}:${seconds}.${hundredth}`
     }
 
+
+    //lock clock logic
+    const handleToggle = () => {
+        if (isLockInRunning) {
+            setIsLockInRunning(false)
+            setIsClockOutRunning(true)
+        } else if (isClockOutRunning) { 
+            setIsClockOutRunning(false)
+            setIsLockInRunning(true)
+        } else {
+            setIsLockInRunning(true)
+        }
+    }
+
+    //clock out appears after 5
+    useEffect (()=> {
+        if (lockInTime >= 30000){
+            setShowClockOut(true)
+        }
+    }, [lockInTime])
     return (
         <div className ='timer-container'>
-            <button className='lockin' onClick={toggleTimer}>LOCK IN</button>
-            <div className='intime'>{formatTime(time)}</div>
+            {!showClockOut ? (
+                <div className="lockin-section">
+                    <button className="lockin" onClick={handleToggle}>LOCK IN.</button>
+                    <div className="intime">{formatTime(lockInTime)}</div>
+                </div>
+            ) : (
+                <div className="split-container">
+                    <div className="lockin-section">
+                        <button
+                            className={`lockin ${isLockInRunning ? 'active' : ''}`}
+                            onClick={handleToggle}
+                        >
+                            LOCK IN
+                        </button>
+                        <div className="intime">{formatTime(lockInTime)}</div>
+                    </div>
+                    <div className="clockout-section">
+                        <button
+                            className={`clockout ${isClockOutRunning ? 'active' : ''}`}
+                            onClick={handleToggle}
+                        >
+                            CLOCK OUT
+                        </button>
+                        <div className="outtime">{formatTime(clockOutTime)}</div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

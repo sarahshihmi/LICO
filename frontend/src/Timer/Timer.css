@@ -6,4 +6,38 @@
     height: 100vh;
     width: 100vw;
     margin: 0;
+    border: 10px solid red;
+}
+
+.lockin,
+.clockout {
+    border: none;
+    background: transparent;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+.lockin-section,
+.clockout-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    border: 2px solid black;
+    padding: 20px;
+    margin: 10px;
+    box-sizing: border-box;
+}
+
+.split-container {
+    display: flex;
+    width: 100%;
+    height: 100vh;
+}
+
+.lockin.active,
+.clockout.active {
+    color: #00f;
 }
